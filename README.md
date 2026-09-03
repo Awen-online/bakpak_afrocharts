@@ -1,101 +1,101 @@
 <p align="center">
-  <img src="docs/assets/valt-banner.png" alt="Valt — Token-gated music platform on Cardano" width="100%">
+  <img src="docs/assets/valt-banner.png" alt="Valt - Token-gated music platform on Cardano" width="600">
 </p>
 
-# Afrocharts | Web3 Artist Portal (Awen)
+<p align="center">
+  <a href="https://www.valt.digital">valt.digital</a> &bull;
+  <a href="https://projectcatalyst.io/funds/11/cardano-use-cases-concept/afrocharts-or-web3-artist-portal-awen">Catalyst Fund11</a> &bull;
+  <a href="https://awen.online">Awen</a>
+</p>
 
-## aka Valt
-
-**Websites:** [Catalyst Proposal](https://projectcatalyst.io/funds/11/cardano-use-cases-concept/afrocharts-or-web3-artist-portal-awen) | [valt.digital](https://www.valt.digital) | [Afrocharts](https://www.afrocharts.com)
-
-
-Welcome to the official GitHub repository for **Valt** aka Afrocharts Web3 Portal. We are an ambitious initiative spearheaded by Awen aimed at transforming the accessibility and integration of music through Web3 technologies using Cardano blockchain.
-
-In the rapidly evolving landscape of digital music and interactive experiences, the necessity for a streamlined, equitable, and innovative method to feature African music within these domains grows ever more critical.
-
-Valt is poised to meet this challenge head-on with the an exciting partnership with Afrocharts.
-
-## Our Vision
-
-Our mission is to revolutionize the way music is utilized in the digital realm. Our vision is a transparent, efficient, and fair ecosystem where artists receive fair recognition and compensation for the impact and cultural contributions.
-
-Valt embodies a streamlined vision for a more connected and financially equitable music industry, where artists and fans engage in meaningful exchanges.
-
-## What Makes Valt Unique?
-**Proof of Verified Ownership:** Valt introduces a secure way to collect and manage music licenses using blockchain. This ensures artists are compensated and provides collectors with a platform to prove ownership, enhancing the value and enjoyment of digital music collecting.
-
-**Direct-to-Fan Exclusivity:** Through Valt, artists offer exclusive content directly to fans, fostering intimate relationships and unique music experiences. This direct line enhances the fan experience with personal touches and rare content.
-
-**A Community-Driven Marketplace:** At its core, Valt features a marketplace driven by its community, allowing fans to buy, sell, and trade music licenses. This not only supports artists but also offers fans a way to monetize their collections, creating a lively ecosystem where music assets circulate, benefiting all participants.
+<p align="center">
+  <img src="https://img.shields.io/badge/Catalyst-Fund11-3D3C56?style=flat-square" alt="Catalyst Fund11">
+  <img src="https://img.shields.io/badge/grant-100%2C000%20ADA-C9A66B?style=flat-square" alt="100,000 ADA">
+  <img src="https://img.shields.io/badge/code-MIT-E8C48B?style=flat-square" alt="MIT">
+  <img src="https://img.shields.io/badge/network-Cardano%20preprod-0033AD?style=flat-square" alt="Cardano preprod">
+</p>
 
 ---
+
+# Valt | Web3 Artist Portal on Cardano
+
+*Project Catalyst Fund 11: "Afrocharts | Web3 Artist Portal" (Awen), Project #1100019*
+
+Valt is an open-source, token-gated music platform where independent artists publish their music and fans **collect songs as Cardano NFTs** to unlock exclusive, per-artist content ("The Valt"). Access follows **on-chain ownership**: content is withheld on the server, never merely hidden in the browser.
+
+Built on WordPress, powered by Cardano, and funded by **Project Catalyst Fund 11**.
+
+## Features
+
+- **Server-side NFT token-gating** - content is released only to wallets that hold the artist's song NFT, checked against the CardanoPress asset cache on the server
+- **Artist Valts** - per-artist gated fan-club zones, configurable from the artist dashboard
+- **Collect songs as Cardano NFTs** - minting and edition copies via NMKR, with full music-token metadata
+- **Artist Dashboard** - a frontend profile editor and release manager with media uploaders
+- **In-product feedback survey** - a persisted NPS and ownership-model survey (the M3 feedback deliverable), live at [/feedback](https://www.valt.digital/feedback/)
+- **REST API** - namespaced discovery and ownership-status endpoints (`/wp-json/valt/v1/`)
+- **Automated tests and CI** - a PHPUnit suite plus a load harness, run on PHP 8.0-8.3 via GitHub Actions on every push
 
 ## Repository Structure
 
 ```
-/code     Source code for WordPress theme and platform plugin
-/docs     Project documentation, reports, and API references
+valt/
+├── code/                      # Curated open-source subset of the platform (plugin + theme)
+│   ├── valt-platform/         # Token-gating, NMKR minting, REST API, artist dashboard
+│   └── valt-theme/            # Hello Elementor child: templates, Pods, site chrome
+├── docs/                      # Project Catalyst milestone evidence
+│   ├── M1_Initialization/     # Setup report, API docs, status + timeline
+│   ├── M2_Development/        # Development report, launch-partner roster, evidence
+│   └── M3_Implementation/     # Test & bug-fix, security audit, feedback + roadmap, PoA
+├── tests/                     # PHPUnit suite + load harness
+└── README.md
 ```
 
-> [/docs](docs/README.md) — Comprehensive documentation including technical details, user guides, and design overviews.
+> **[/code](code/README.md)** - the curated open-source platform (plugin + theme)
 >
-> [/code](code/README.md) — Source code for the WordPress theme and platform plugin.
+> **[/docs](docs/README.md)** - Catalyst milestone reports, design documents, and the project timeline
 
----
-
-## Codebase Overview
-
-The platform runs on **WordPress** and is split into two custom components:
-
-### [valt-theme](code/valt-theme/)
-WordPress child theme of Hello Elementor. Responsibilities:
-- Elementor Pro page templates and dynamic query hooks
-- Pods CPT integration (Artists, Albums, Songs — relationships, fields, dynamic tags)
-- CardanoPress template overrides (collection page, dashboard)
-- Frontend asset pipeline (Ruda font, Valt colour palette)
-- Afrocharts data sync script
-
-### [valt-platform](code/valt-platform/)
-Standalone WordPress plugin. Responsibilities:
-- **Server-side NFT token-gating** via CardanoPress policy ID check — content is withheld on the server, never just CSS-hidden
-- **Artist Valt** — per-artist gated fan-club zone configurable from the artist dashboard
-- **Artist Dashboard** — frontend profile editor and release manager with `wp.media()` uploaders
-- Six Elementor-droppable shortcodes
-- Admin meta boxes (Song release status, Artist policy ID column)
-
-### Tech Stack
+## Tech Stack
 
 | Layer | Technology |
-|-------|------------|
+|-------|-----------|
 | CMS | WordPress 6+ |
 | Parent Theme | Hello Elementor |
 | Page Builder | Elementor Pro |
 | Data Layer | Pods (CPTs: Artists, Albums, Songs) |
-| Blockchain | CardanoPress (Cardano wallet, delegation, NFT assets) |
-| Token-Gating | valt-platform plugin (server-side, CardanoPress API) |
-| Local Dev | Local by Flywheel |
+| Wallet | CardanoPress (CIP-30 connection, delegation, NFT assets) |
+| Minting | NMKR (mint-and-send, IPFS pinning) |
+| Token-Gating | valt-platform plugin (server-side, CardanoPress asset cache) |
+| Tests / CI | PHPUnit + GitHub Actions (PHP 8.0-8.3) + semgrep |
+
+## Project Catalyst Fund 11
+
+Valt is funded by a **100,000 ADA** grant from [Cardano Project Catalyst Fund 11](https://projectcatalyst.io/funds/11/cardano-use-cases-concept/afrocharts-or-web3-artist-portal-awen) under the **Cardano Use Cases** category (Project #1100019).
+
+| Milestone | Focus | Status |
+|-----------|-------|--------|
+| M1 | Initialization - infrastructure & design | Delivered |
+| M2 | Development - core platform & launch partners | Delivered - [evidence](docs/M2_Development/) |
+| M3 | Implementation & Prelaunch - testing, security, feedback | Evidence published - [evidence](docs/M3_Implementation/) |
+| M4 | Launch & Rollout | Upcoming |
+| M5 | Closeout & Evaluation | Upcoming |
+
+## Getting Started
+
+See **[code/README.md](code/README.md)** for installation, configuration, and the shortcode and REST API reference. The published build is verified on every push: `composer install && vendor/bin/phpunit` (expect `OK, 15 tests, 25 assertions`), and `php tests/load-plugin.php code/valt-platform` reports `VERDICT=LOADED`.
+
+## License
+
+The code released in this repository is licensed under the **[MIT License](LICENSE)**, as committed in the Project Catalyst Fund 11 application. Copyright (c) 2026 Awen LLC.
+
+The hosted Valt platform at [valt.digital](https://www.valt.digital), along with platform-specific operational logic that is not part of this repository (the NMKR minting pipeline, feedback-pulse bridge, admin tooling, etc.), remains proprietary to Awen LLC.
 
 ---
 
-## Shortcodes at a Glance
-
-The `valt-platform` plugin exposes these shortcodes (full reference in [code/valt-platform/README.md](code/valt-platform/README.md) and in the **Valt Platform → Shortcode Reference** page in wp-admin):
-
-| Shortcode | Type | Purpose |
-|-----------|------|---------|
-| `[valt_gated_content]` | Enclosing | Server-side NFT gate — non-holders never receive the HTML |
-| `[valt_connect_prompt]` | Self-closing | CardanoPress wallet connect button; silent if already connected |
-| `[valt_artist_profile]` | Self-closing | Public artist card: photo, name, genre, country, bio |
-| `[valt_artist_valt]` | Enclosing | Public artist header + gated fan-club zone |
-| `[valt_artist_dashboard]` | Self-closing | Full frontend artist profile & release management dashboard |
-| `[valt_release_status]` | Self-closing | Inline badge: Uploaded / In NFT Collection / Minted |
-
----
-
-## Join the Movement
-
-Valt is more than just a project; it's a pioneering movement aimed at elevating the presence and impact of African music in digital spaces worldwide. Whether you're an artist aspiring to globalize your music, a developer in search of unique soundtracks for your projects, or an enthusiast passionate about the convergence of music and technology, we welcome you to join us.
-
-For more information, to participate in our journey, or to share your ideas and feedback, please contact us at info@valt.digital.
-
-Let's embark on this exciting journey together to redefine the future!
+<p align="center">
+  <a href="https://awen.online">
+    <img src="https://awen.online/wp-content/uploads/2025/01/Awen-Logo-2.0-Full-Final.png" alt="Awen" width="120">
+  </a>
+</p>
+<p align="center">
+  Built by <a href="https://awen.online">Awen</a>
+</p>
