@@ -47,14 +47,19 @@ Here you can find links to all neccessary documentation for each of the mileston
 >[Source code](../code) - the curated open-source platform (plugin + theme)
 
 ### Milestone 3 - Implementation & Prelaunch
-
->[Proof of Achievement](M3_Implementation/Valt_M3_Proof_of_Achievement.pdf) - the milestone summary: outputs, acceptance criteria, evidence, and how a reviewer can verify every claim independently
+>**Documents**
+>
+>[Proof of Achievement](M3_Implementation/M3_Proof_of_Achievement.pdf) - the milestone summary: outputs, acceptance criteria, evidence, and how a reviewer can verify every claim independently
 >
 >[Test & Bug-Fix Report](M3_Implementation/M3_Test_and_Bugfix_Report.pdf) - the test suite and its results, the six defects found and resolved, repository reconciliation, known limitations
 >
->[Security Audit Report](M3_Implementation/M3_Security_Audit_Report.pdf) - automated scanning (semgrep) and the manual assessment: controls review, six findings with dispositions, mainnet prerequisites
+>[Security Audit Report](M3_Implementation/M3_Security_Audit_Report.pdf) - automated scanning (semgrep) plus an autonomous-style assessment, the manual and on-chain security reviews, findings with dispositions, and mainnet prerequisites
 >
->[User Feedback & Roadmap](M3_Implementation/M3_User_Feedback_and_Roadmap.pdf) - feedback channels, the launch-partner survey instrument, improvements made, and the updated roadmap through M4/M5
+>[User Feedback & Roadmap](M3_Implementation/M3_User_Feedback_and_Roadmap.pdf) - feedback channels, the in-product survey, the analysis (n=5: artists and collectors), improvements made, and the updated roadmap through M4/M5
+>
+>[Project Status Report (M3)](M3_Implementation/M3_Project_Status.pdf) - current project status
+>
+>[Project Timeline (M3)](M3_Implementation/M3_Project_Timeline.pdf) - updated roadmap, timeline, and responsibilities
 >
 >**Verify**
 >
