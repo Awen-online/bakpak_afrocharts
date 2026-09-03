@@ -96,24 +96,6 @@ add_action( 'rest_api_init', function () {
 		],
 	] );
 
-	// ── Stripe ───────────────────────────────────────────────────────
-
-	register_rest_route( 'valt/v1', '/stripe/create-checkout', [
-		'methods'             => 'POST',
-		'callback'            => 'valt_rest_create_checkout',
-		'permission_callback' => 'is_user_logged_in',
-		'args'                => [
-			'song_id'        => [ 'type' => 'integer', 'required' => true ],
-			'wallet_address' => [ 'type' => 'string',  'default' => '' ],
-		],
-	] );
-
-	register_rest_route( 'valt/v1', '/stripe/webhook', [
-		'methods'             => 'POST',
-		'callback'            => 'valt_rest_stripe_webhook',
-		'permission_callback' => '__return_true', // Auth via Stripe signature.
-	] );
-
 	// ── NFT Status ───────────────────────────────────────────────────
 
 	register_rest_route( 'valt/v1', '/nft/status/(?P<song_id>\d+)', [
@@ -212,33 +194,6 @@ function valt_rest_pledge_campaign( WP_REST_Request $request ): WP_REST_Response
 		return new WP_REST_Response( [ 'total_pledged' => $result ], 200 );
 	}
 	return new WP_REST_Response( [ 'error' => 'Campaigns not available.' ], 501 );
-}
-
-function valt_rest_create_checkout( WP_REST_Request $request ): WP_REST_Response {
-	$song_id = (int) $request->get_param( 'song_id' );
-	$wallet  = sanitize_text_field( $request->get_param( 'wallet_address' ) );
-	$user_id = get_current_user_id();
-
-	$result = valt_create_checkout_session( $song_id, $user_id, $wallet );
-	if ( is_wp_error( $result ) ) {
-		return new WP_REST_Response( [ 'error' => $result->get_error_message() ], 400 );
-	}
-	return new WP_REST_Response( $result, 200 );
-}
-
-function valt_rest_stripe_webhook( WP_REST_Request $request ): WP_REST_Response {
-	$payload   = $request->get_body();
-	$signature = $request->get_header( 'stripe-signature' );
-
-	if ( ! $signature ) {
-		return new WP_REST_Response( [ 'error' => 'Missing signature.' ], 400 );
-	}
-
-	$result = valt_handle_stripe_webhook( $payload, $signature );
-	if ( is_wp_error( $result ) ) {
-		return new WP_REST_Response( [ 'error' => $result->get_error_message() ], 400 );
-	}
-	return new WP_REST_Response( [ 'received' => true ], 200 );
 }
 
 function valt_rest_nft_status( WP_REST_Request $request ): WP_REST_Response {

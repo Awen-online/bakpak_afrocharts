@@ -101,12 +101,6 @@ if ( ! $image_url && $artist_id ) {
 			<div class="valt-song-actions">
 				<h2>Collect This Song</h2>
 				<?php echo do_shortcode( '[valt_connect_mint song_id="' . $song_id . '"]' ); ?>
-				<?php
-				$price_usd = (int) get_post_meta( $song_id, 'valt_nft_price_usd', true );
-				if ( $price_usd ) :
-					echo do_shortcode( '[valt_checkout_button song_id="' . $song_id . '" label="Buy with Card"]' );
-				endif;
-				?>
 			</div>
 
 			<?php if ( $artist_id ) : ?>

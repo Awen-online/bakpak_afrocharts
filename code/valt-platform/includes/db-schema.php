@@ -68,7 +68,6 @@ add_action( 'admin_init', function () {
 		if ( ! get_option( 'valt_feature_flags' ) ) {
 			update_option( 'valt_feature_flags', [
 				'nmkr'         => true,
-				'stripe'       => true,
 				'discovery'    => true,
 				'leaderboard'  => false,
 				'gamification' => false,

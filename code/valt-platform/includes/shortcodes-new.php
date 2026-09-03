@@ -313,40 +313,6 @@ add_shortcode( 'valt_nft_status', function ( $atts ) {
 	return '<span class="valt-badge valt-badge--' . $class . '" data-nft-status="' . esc_attr( $song_id ) . '">' . esc_html( ucfirst( $status ) ) . '</span>';
 } );
 
-// ─── 8. [valt_checkout_button] ──────────────────────────────────────
-
-add_shortcode( 'valt_checkout_button', function ( $atts ) {
-	$atts    = shortcode_atts( [ 'song_id' => 0, 'label' => 'Buy with Card' ], $atts );
-	$song_id = (int) $atts['song_id'];
-	if ( ! $song_id ) return '';
-
-	$price_usd = (int) get_post_meta( $song_id, 'valt_nft_price_usd', true );
-	if ( ! $price_usd ) return '';
-
-	// Detect connected wallet for auto NFT delivery.
-	$wallet_addr = '';
-	if ( function_exists( 'cardanoPress' ) && cardanoPress()->userProfile()->isConnected() ) {
-		$wallet_addr = cardanoPress()->userProfile()->connectedWallet();
-	}
-
-	ob_start(); ?>
-	<div class="valt-checkout" data-song-id="<?php echo $song_id; ?>">
-		<button class="valt-btn valt-btn--secondary valt-checkout__btn" data-action="checkout">
-			<?php echo esc_html( $atts['label'] ); ?> — $<?php echo number_format( $price_usd / 100, 2 ); ?>
-		</button>
-		<?php if ( $wallet_addr ) : ?>
-			<input type="hidden" data-wallet value="<?php echo esc_attr( $wallet_addr ); ?>">
-			<p class="valt-checkout__hint">NFT will be delivered to your connected wallet.</p>
-		<?php else : ?>
-			<div class="valt-checkout__wallet-row" style="margin-top:8px;">
-				<input type="text" class="valt-form__input" placeholder="Wallet address for NFT delivery (optional)" data-wallet>
-				<p class="valt-checkout__hint">Leave empty to receive a claim link instead.</p>
-			</div>
-		<?php endif; ?>
-	</div>
-	<?php return ob_get_clean();
-} );
-
 // ─── 9. [valt_campaign_card] ────────────────────────────────────────
 
 add_shortcode( 'valt_campaign_card', function ( $atts ) {
@@ -487,19 +453,10 @@ add_shortcode( 'valt_connect_mint', function ( $atts ) {
 	$song_id = (int) $atts['song_id'];
 	if ( ! $song_id ) return '';
 
-	$price_usd = (int) get_post_meta( $song_id, 'valt_nft_price_usd', true );
-	$stripe_ok = function_exists( 'valt_feature_enabled' ) && valt_feature_enabled( 'stripe' ) && defined( 'VALT_STRIPE_SECRET_KEY' );
-
 	ob_start(); ?>
 	<div class="valt-connect-mint">
-		<?php // Primary: Collect with ADA via NMKR payment gateway. ?>
+		<?php // Collect with ADA via the NMKR payment gateway — on-chain only. ?>
 		<?php echo do_shortcode( '[valt_mint_button song_id="' . $song_id . '"]' ); ?>
-
-		<?php // Secondary: Pay with card via Stripe (only if Stripe is configured). ?>
-		<?php if ( $price_usd && $stripe_ok ) : ?>
-			<div class="valt-connect-mint__divider"><span>or</span></div>
-			<?php echo do_shortcode( '[valt_checkout_button song_id="' . $song_id . '"]' ); ?>
-		<?php endif; ?>
 	</div>
 	<?php return ob_get_clean();
 } );
@@ -518,7 +475,6 @@ add_shortcode( 'valt_song_card', function ( $atts ) {
 	$artist    = $artist_id ? get_post( $artist_id ) : null;
 	$image_id  = (int) get_post_meta( $song_id, 'valt_nft_image_id', true ) ?: get_post_thumbnail_id( $song_id );
 	$image_url = $image_id ? wp_get_attachment_image_url( $image_id, 'large' ) : '';
-	$price_usd = (int) get_post_meta( $song_id, 'valt_nft_price_usd', true );
 
 	ob_start(); ?>
 	<div class="valt-song-card">
@@ -532,11 +488,7 @@ add_shortcode( 'valt_song_card', function ( $atts ) {
 			<?php echo do_shortcode( '[valt_nft_status song_id="' . $song_id . '"]' ); ?>
 		</div>
 		<div class="valt-song-card__actions">
-			<?php if ( $price_usd ) : ?>
-				<?php echo do_shortcode( '[valt_checkout_button song_id="' . $song_id . '"]' ); ?>
-			<?php else : ?>
-				<?php echo do_shortcode( '[valt_connect_mint song_id="' . $song_id . '"]' ); ?>
-			<?php endif; ?>
+			<?php echo do_shortcode( '[valt_connect_mint song_id="' . $song_id . '"]' ); ?>
 		</div>
 	</div>
 	<?php return ob_get_clean();

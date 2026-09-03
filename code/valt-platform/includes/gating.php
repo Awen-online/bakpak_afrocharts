@@ -2,10 +2,25 @@
 defined( 'ABSPATH' ) || exit;
 
 /**
+ * How long the CardanoPress asset cache is trusted before a refresh is queued.
+ *
+ * The cache (cardanopress_stored_assets) is only rebuilt on login/explicit sync,
+ * so without this it can outlive real ownership: a holder who sells or transfers
+ * their NFT keeps access until they next log in, and a secondary-market buyer
+ * gains it late. A short TTL makes gating track on-chain ownership in both
+ * directions — which matters precisely because holdings move on other markets.
+ */
+const VALT_ASSET_CACHE_TTL = 15 * MINUTE_IN_SECONDS;
+
+/**
  * Check whether the current logged-in user holds at least one asset
  * from the given CardanoPress NFT policy ID.
  *
- * Uses server-side stored assets — the wallet owner cannot spoof this.
+ * The decision is server-side: it reads the CardanoPress-maintained asset cache,
+ * never a client-supplied value, and non-holders are never sent the gated markup.
+ * The cache's integrity depends on the wallet layer binding each stored asset set
+ * to a cryptographically verified wallet; see the stake-binding guard mu-plugin.
+ * Freshness is kept in check by valt_maybe_refresh_stale_assets().
  */
 function valt_user_holds_policy( string $policy_id ): bool {
 	if ( ! function_exists( 'cardanoPress' ) ) {
@@ -17,6 +32,8 @@ function valt_user_holds_policy( string $policy_id ): bool {
 	if ( ! $profile->isConnected() ) {
 		return false;
 	}
+
+	valt_maybe_refresh_stale_assets();
 
 	$assets = $profile->storedAssets();
 
@@ -32,6 +49,62 @@ function valt_user_holds_policy( string $policy_id ): bool {
 
 	return false;
 }
+
+/**
+ * Queue a background refresh of the current user's on-chain asset cache when it
+ * has gone stale, without blocking the request.
+ *
+ * The gate serves the currently-cached result on this request and the refreshed
+ * set applies to the next one. Refreshing reuses CardanoPress's own sanctioned
+ * path — the wp_login status check — which rebuilds the cache from Blockfrost for
+ * the given user and fails safe if the wallet layer or Blockfrost is unconfigured.
+ */
+function valt_maybe_refresh_stale_assets(): void {
+	$user_id = get_current_user_id();
+
+	if ( ! $user_id ) {
+		return;
+	}
+
+	$synced_at = (int) get_user_meta( $user_id, 'valt_assets_synced_at', true );
+
+	if ( ( time() - $synced_at ) < VALT_ASSET_CACHE_TTL ) {
+		return;
+	}
+
+	// Avoid piling up duplicate jobs while one is already queued.
+	if ( wp_next_scheduled( 'valt_refresh_user_assets', [ $user_id ] ) ) {
+		return;
+	}
+
+	// Stamp now, so a burst of gated views in the same window queues only once.
+	update_user_meta( $user_id, 'valt_assets_synced_at', time() );
+	wp_schedule_single_event( time() + 1, 'valt_refresh_user_assets', [ $user_id ] );
+}
+
+/**
+ * Cron handler: rebuild a user's asset cache from chain via CardanoPress.
+ *
+ * @param int $user_id WP user whose cache to refresh.
+ */
+function valt_refresh_user_assets( int $user_id ): void {
+	if ( ! function_exists( 'cardanoPress' ) ) {
+		return;
+	}
+
+	$user = get_user_by( 'id', $user_id );
+
+	if ( ! $user ) {
+		return;
+	}
+
+	// CardanoPress's doWalletStatusChecks() is bound to wp_login and rebuilds the
+	// stored-asset cache for the passed user from Blockfrost. It reads the user's
+	// stored network/stake and returns early if either is missing or Blockfrost is
+	// not configured, so this is safe to fire from cron.
+	do_action( 'wp_login', $user->user_login, $user );
+}
+add_action( 'valt_refresh_user_assets', 'valt_refresh_user_assets' );
 
 /**
  * Resolve the artist NAME a held NFT belongs to.

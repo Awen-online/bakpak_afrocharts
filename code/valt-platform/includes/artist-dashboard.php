@@ -225,8 +225,8 @@ function valt_render_artist_dashboard( WP_Post $artist ): string {
 							<?php foreach ( $songs as $song ) : ?>
 								<?php
 								$song_album_id  = (int) get_post_meta( $song->ID, 'album', true );
-								$song_album     = $song_album_id ? get_the_title( $song_album_id ) : '&mdash;';
-								$song_duration  = get_post_meta( $song->ID, 'duration', true ) ?: '&mdash;';
+								$song_album     = $song_album_id ? get_the_title( $song_album_id ) : '—';
+								$song_duration  = get_post_meta( $song->ID, 'duration', true ) ?: '—';
 								$song_status    = (int) get_post_meta( $song->ID, 'valt_release_status', true ) ?: 1;
 								$song_mint      = (int) get_post_meta( $song->ID, 'valt_mint_count', true );
 
@@ -245,8 +245,8 @@ function valt_render_artist_dashboard( WP_Post $artist ): string {
 								?>
 								<tr>
 									<td><?php echo esc_html( get_the_title( $song->ID ) ); ?></td>
-									<td><?php echo $song_album; ?></td>
-									<td><?php echo $song_duration; ?></td>
+									<td><?php echo esc_html( $song_album ); ?></td>
+									<td><?php echo esc_html( $song_duration ); ?></td>
 									<td>
 										<span class="valt-badge <?php echo esc_attr( $status_class ); ?>">
 											<?php echo esc_html( $status_label ); ?>

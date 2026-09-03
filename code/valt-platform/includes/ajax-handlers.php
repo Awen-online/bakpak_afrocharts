@@ -82,18 +82,7 @@ add_action( 'wp_ajax_valt_set_song_price', function () {
 	update_post_meta( $song_id, 'valt_nft_price_ada', $price_ada );
 	update_post_meta( $song_id, 'valt_nft_max_supply', $max_supply );
 
-	// Sync to Stripe if USD price set.
-	$stripe_result = null;
-	if ( $price_usd > 0 ) {
-		$stripe_result = valt_sync_song_to_stripe( $song_id );
-	}
-
-	$response = [ 'message' => 'Pricing updated.' ];
-	if ( is_wp_error( $stripe_result ) ) {
-		$response['stripe_error'] = $stripe_result->get_error_message();
-	}
-
-	wp_send_json_success( $response );
+	wp_send_json_success( [ 'message' => 'Pricing updated.' ] );
 } );
 
 // ─── Upload Cover Art ────────────────────────────────────────────────

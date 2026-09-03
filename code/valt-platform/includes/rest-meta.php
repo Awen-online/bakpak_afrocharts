@@ -92,8 +92,6 @@ add_action( 'init', function () {
 		'valt_nft_asset_id',
 		'valt_nft_wallet_address',
 		'valt_nft_price_ada',
-		'valt_stripe_product_id',
-		'valt_stripe_price_id',
 	] as $key ) {
 		register_post_meta( 'song', $key, [
 			'show_in_rest'      => true,

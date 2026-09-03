@@ -1,1 +1,20 @@
 docs/M2_Development/screenshots/_superseded/
+
+# Composer — vendor/ is built from the committed composer.lock
+/vendor/
+
+# PHPUnit
+/.phpunit.cache/
+/.phpunit.result.cache
+
+# Scan output
+semgrep.sarif
+
+# Never commit secrets or a WordPress config
+wp-config.php
+.env
+*.pem
+*.key
+
+# Local-only working material — never committed. Any _private folder, any depth.
+_private/

@@ -21,8 +21,7 @@ add_action( 'init', function () {
 	}
 } );
 
-// Hook one-time async events to their handler functions (defined in nmkr.php and stripe.php).
+// Hook one-time async events to their handler functions (defined in nmkr.php).
 add_action( 'valt_mint_nft_async', 'valt_do_mint_nft' );
 add_action( 'valt_check_nft_status', 'valt_do_check_nft_status' );
 add_action( 'valt_poll_processing_nfts', 'valt_do_poll_processing_nfts' );
-add_action( 'valt_process_stripe_checkout_async', 'valt_do_process_stripe_checkout' );

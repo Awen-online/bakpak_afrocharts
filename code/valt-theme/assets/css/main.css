@@ -527,7 +527,7 @@ p { color: var(--valt-tan); margin-bottom: 1em; }
 .valt-campaign__pledge { display: flex; gap: 0.5rem; margin-top: 1rem; }
 .valt-campaign__pledge input { flex: 1; }
 
-/* ─── Mint / Checkout (wallet-aware) ──────────────────────────────── */
+/* ─── Mint / Collect (wallet-aware) ──────────────────────────────── */
 .valt-mint { margin: 1rem 0; }
 .valt-mint__prices { display: flex; align-items: baseline; gap: 1rem; margin-bottom: 1rem; flex-wrap: wrap; }
 .valt-mint__price-ada { font-size: 1.5rem; font-weight: 700; color: var(--valt-gold); }
@@ -584,18 +584,7 @@ p { color: var(--valt-tan); margin-bottom: 1em; }
 .valt-mint__tier--bundle .valt-mint__tier-usd { color: var(--valt-green); font-size: var(--valt-fs-xs); font-weight: 500; }
 .valt-mint__tier--bundle:hover { background: rgba(232,196,139,0.08); }
 
-.valt-checkout { margin: 1rem 0; }
-.valt-checkout__hint { font-size: 0.8rem; color: var(--valt-mid); margin-top: 0.4rem; }
-.valt-checkout__btn { display: inline-flex; align-items: center; gap: 0.5rem; }
-
 /* ─── Connect-Mint Combo ──────────────────────────────────────────── */
-.valt-connect-mint__divider {
-	display: flex; align-items: center; gap: 1rem; margin: 1rem 0;
-	color: var(--valt-mid); font-size: 0.8rem;
-}
-.valt-connect-mint__divider::before, .valt-connect-mint__divider::after {
-	content: ''; flex: 1; height: 1px; background: rgba(232,196,139,0.15);
-}
 .valt-connect-mint__nudge {
 	display: flex; align-items: center; gap: 0.5rem;
 	margin-top: 1rem; padding: 0.6rem 0.8rem;

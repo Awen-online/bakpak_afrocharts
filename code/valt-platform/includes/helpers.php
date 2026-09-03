@@ -6,6 +6,45 @@ defined( 'ABSPATH' ) || exit;
  */
 
 /**
+ * Resolve a song's artist post ID robustly.
+ *
+ * Pods relationship meta ('artist') can come back as a non-scalar (array/object),
+ * where a naive (int) cast collapses to 1 (= the default "Hello world!" post).
+ * Mirrors single-song.php: raw meta → _pods_artist → podsrel, then validates the
+ * result is actually an 'artist' post.
+ */
+function valt_resolve_artist_id( int $song_id ): int {
+	$raw = get_post_meta( $song_id, 'artist', true );
+	$id  = 0;
+	if ( is_numeric( $raw ) ) {
+		$id = (int) $raw;
+	} elseif ( is_array( $raw ) && ! empty( $raw ) ) {
+		$first = reset( $raw );
+		$id = ( is_object( $first ) && isset( $first->ID ) ) ? (int) $first->ID : (int) $first;
+	} elseif ( is_object( $raw ) && isset( $raw->ID ) ) {
+		$id = (int) $raw->ID;
+	}
+	if ( ! $id ) {
+		$pods = get_post_meta( $song_id, '_pods_artist', true );
+		if ( is_array( $pods ) && ! empty( $pods ) ) {
+			$id = (int) reset( $pods );
+		}
+	}
+	if ( ! $id ) {
+		global $wpdb;
+		$id = (int) $wpdb->get_var( $wpdb->prepare(
+			"SELECT related_item_id FROM {$wpdb->prefix}podsrel WHERE item_id = %d AND pod_id = (SELECT id FROM {$wpdb->prefix}posts WHERE post_name = 'song' AND post_type = '_pods_pod' LIMIT 1) LIMIT 1",
+			$song_id
+		) );
+	}
+	// Never return a non-artist (e.g. the default Hello-world post).
+	if ( $id && get_post_type( $id ) !== 'artist' ) {
+		$id = 0;
+	}
+	return $id;
+}
+
+/**
  * Get NMKR configuration for the active environment.
  */
 function valt_nmkr_config(): array {
@@ -26,19 +65,6 @@ function valt_nmkr_config(): array {
 }
 
 /**
- * Get Stripe configuration for the active environment.
- */
-function valt_stripe_config(): array {
-	$mode = get_option( 'valt_stripe_mode', 'test' );
-	return [
-		'mode'            => $mode,
-		'secret_key'      => defined( 'VALT_STRIPE_SECRET_KEY' ) ? VALT_STRIPE_SECRET_KEY : '',
-		'publishable_key' => defined( 'VALT_STRIPE_PUBLISHABLE_KEY' ) ? VALT_STRIPE_PUBLISHABLE_KEY : '',
-		'webhook_secret'  => defined( 'VALT_STRIPE_WEBHOOK_SECRET' ) ? VALT_STRIPE_WEBHOOK_SECRET : '',
-	];
-}
-
-/**
  * Feature flags — enable/disable major subsystems from Settings.
  */
 function valt_feature_enabled( string $feature ): bool {
@@ -47,7 +73,6 @@ function valt_feature_enabled( string $feature ): bool {
 		'campaigns'    => false,
 		'leaderboard'  => false,
 		'discovery'    => true,
-		'stripe'       => true,
 		'nmkr'         => true,
 	];
 	$flags = wp_parse_args( get_option( 'valt_feature_flags', [] ), $defaults );

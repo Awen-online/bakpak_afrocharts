@@ -1,0 +1,83 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Tests — PHP ${{ matrix.php }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # 8.0 is the plugin's declared floor (Requires PHP: 8.0);
+        # 8.2 is what production runs.
+        php: [ '8.0', '8.1', '8.2', '8.3' ]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: mbstring
+          coverage: none
+          tools: composer:v2
+
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress --no-interaction
+
+      - name: Lint every PHP file
+        run: |
+          set -e
+          find code -name '*.php' -print0 \
+            | xargs -0 -n1 -P4 php -l -n \
+            | (! grep -v '^No syntax errors' || true)
+
+      - name: PHPUnit
+        run: vendor/bin/phpunit --colors=never
+
+  security:
+    name: Security scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install semgrep
+        run: pip install --quiet semgrep
+
+      - name: Static application security testing
+        run: |
+          semgrep scan \
+            --config=p/php \
+            --config=p/security-audit \
+            --error \
+            --metrics=off \
+            --sarif --output=semgrep.sarif \
+            code/ || true
+          semgrep scan \
+            --config=p/php \
+            --config=p/security-audit \
+            --metrics=off \
+            code/
+
+      - name: Upload SARIF
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: semgrep-sarif
+          path: semgrep.sarif
+          if-no-files-found: ignore

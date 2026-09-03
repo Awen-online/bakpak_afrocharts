@@ -370,29 +370,6 @@
 			} ).fail( function () { $status.text( 'Network error.' ); } );
 		} );
 
-		// ── Checkout button ──────────────────────────────────────────
-		$( document ).on( 'click', '[data-action="checkout"]', function () {
-			var $wrap  = $( this ).closest( '.valt-checkout' );
-			var songId = $wrap.data( 'song-id' );
-			var wallet = $wrap.find( '[data-wallet]' ).val() || '';
-
-			$( this ).prop( 'disabled', true ).text( 'Redirecting...' );
-
-			$.ajax( {
-				url:  valtPlatform.restUrl + 'stripe/create-checkout',
-				method: 'POST',
-				data: JSON.stringify( { song_id: songId, wallet_address: wallet } ),
-				contentType: 'application/json',
-				beforeSend: function ( xhr ) { xhr.setRequestHeader( 'X-WP-Nonce', valtPlatform.restNonce ); },
-				success: function ( data ) { window.location.href = data.checkout_url; },
-				error: function ( xhr ) {
-					var msg = xhr.responseJSON ? xhr.responseJSON.error : 'Error';
-					alert( msg );
-					$( this ).prop( 'disabled', false ).text( 'Buy Now' );
-				},
-			} );
-		} );
-
 		// ── Campaign pledge ──────────────────────────────────────────
 		$( document ).on( 'click', '[data-action="pledge"]', function () {
 			var $wrap   = $( this ).closest( '.valt-campaign' );

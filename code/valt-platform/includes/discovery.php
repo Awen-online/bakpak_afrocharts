@@ -152,7 +152,7 @@ function valt_format_artist_card( WP_Post $post ): array {
 		'genre'         => get_post_meta( $post->ID, 'genre', true ) ?: '',
 		'country'       => get_post_meta( $post->ID, 'country', true ) ?: '',
 		'bio'           => wp_trim_words( get_post_meta( $post->ID, 'bio', true ) ?: '', 20 ),
-		'thumbnail_url' => $thumb_id ? wp_get_attachment_image_url( $thumb_id, 'medium' ) : '',
+		'thumbnail_url' => $thumb_id ? wp_get_attachment_image_url( $thumb_id, 'large' ) : '',
 		'fan_count'     => (int) get_post_meta( $post->ID, 'valt_fan_count', true ),
 		'featured'      => (bool) get_post_meta( $post->ID, 'valt_featured', true ),
 		'url'           => get_permalink( $post->ID ),
