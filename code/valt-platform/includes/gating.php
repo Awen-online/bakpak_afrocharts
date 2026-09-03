@@ -19,7 +19,11 @@ const VALT_ASSET_CACHE_TTL = 15 * MINUTE_IN_SECONDS;
  * The decision is server-side: it reads the CardanoPress-maintained asset cache,
  * never a client-supplied value, and non-holders are never sent the gated markup.
  * The cache's integrity depends on the wallet layer binding each stored asset set
- * to a cryptographically verified wallet; see the stake-binding guard mu-plugin.
+ * to a cryptographically verified wallet. That binding is provided by CardanoPress
+ * itself and MUST be kept at >= v1.36.1, which derives the stake address
+ * server-side from the signed wallet address and ignores any client-supplied
+ * stake_address (the fix for the auth-bypass 0-day Valt disclosed). The interim
+ * stake-binding guard mu-plugin was removed once that upstream fix shipped.
  * Freshness is kept in check by valt_maybe_refresh_stale_assets().
  */
 function valt_user_holds_policy( string $policy_id ): bool {

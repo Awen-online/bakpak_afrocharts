@@ -6,8 +6,10 @@ defined( 'ABSPATH' ) || exit;
  */
 add_action( 'init', function () {
 
-	$auth_edit = function () {
-		return current_user_can( 'edit_posts' );
+	// Object-scoped: authorise the write against the SPECIFIC post, not just the
+	// contributor-level 'edit_posts' capability. See M3 security assessment FIND-03.
+	$auth_edit = function ( $allowed, $meta_key, $object_id ) {
+		return current_user_can( 'edit_post', $object_id );
 	};
 
 	// ── Artist meta (existing + new) ─────────────────────────────────
@@ -90,7 +92,6 @@ add_action( 'init', function () {
 		'valt_nft_ipfs_hash',
 		'valt_nft_uid',
 		'valt_nft_asset_id',
-		'valt_nft_wallet_address',
 		'valt_nft_price_ada',
 	] as $key ) {
 		register_post_meta( 'song', $key, [
@@ -102,6 +103,19 @@ add_action( 'init', function () {
 			'auth_callback'     => $auth_edit,
 		] );
 	}
+
+	// The mint recipient's wallet address is used server-side by the mint flow
+	// only — it must NOT be readable via the public REST API, where anyone could
+	// harvest the pseudonymous address off a published song. See M3 security
+	// assessment FIND-02.
+	register_post_meta( 'song', 'valt_nft_wallet_address', [
+		'show_in_rest'      => false,
+		'single'            => true,
+		'type'              => 'string',
+		'default'           => '',
+		'sanitize_callback' => 'sanitize_text_field',
+		'auth_callback'     => $auth_edit,
+	] );
 
 	// NFT integer fields.
 	foreach ( [

@@ -363,10 +363,21 @@ add_action( 'wp_ajax_valt_add_release', function () {
 	$duration  = sanitize_text_field( $_POST['duration'] ?? '' );
 	$track_num = (int) ( $_POST['track_number'] ?? 0 );
 
+	// Ownership: an artist may only reference their own audio attachment and album,
+	// not arbitrary object IDs belonging to other users. See M3 security assessment
+	// FIND-05.
 	if ( $audio_id ) {
+		$audio = get_post( $audio_id );
+		if ( ! $audio || 'attachment' !== $audio->post_type || (int) $audio->post_author !== get_current_user_id() ) {
+			wp_send_json_error( 'You do not own that audio file.' );
+		}
 		update_post_meta( $song_id, 'audio_file', $audio_id );
 	}
 	if ( $album_id ) {
+		$album = get_post( $album_id );
+		if ( ! $album || 'album' !== $album->post_type || (int) $album->post_author !== get_current_user_id() ) {
+			wp_send_json_error( 'You do not own that album.' );
+		}
 		update_post_meta( $song_id, 'album', $album_id );
 	}
 	if ( $duration ) {

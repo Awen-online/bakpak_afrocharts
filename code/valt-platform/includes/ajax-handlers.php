@@ -99,6 +99,14 @@ add_action( 'wp_ajax_valt_upload_cover_art', function () {
 	}
 
 	if ( $image_id > 0 ) {
+		// Ownership: only allow referencing an attachment the user uploaded, so an
+		// artist cannot set another user's (possibly private) media as their cover —
+		// which would then be read from disk and pushed to IPFS at mint time.
+		// See M3 security assessment FIND-05.
+		$image = get_post( $image_id );
+		if ( ! $image || 'attachment' !== $image->post_type || (int) $image->post_author !== get_current_user_id() ) {
+			wp_send_json_error( 'You do not own that image.' );
+		}
 		update_post_meta( $song_id, 'valt_nft_image_id', $image_id );
 		$url = wp_get_attachment_image_url( $image_id, 'medium' );
 		wp_send_json_success( [ 'message' => 'Cover art saved.', 'image_url' => $url ] );
